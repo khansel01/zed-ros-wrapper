@@ -555,6 +555,7 @@ private:
     int mPathMaxCount;
     bool mVerbose;
     bool mSvoMode = false;
+    bool mSimMode = false;
     double mCamMinDepth;
     double mCamMaxDepth;
     std::string mClickedPtTopic;

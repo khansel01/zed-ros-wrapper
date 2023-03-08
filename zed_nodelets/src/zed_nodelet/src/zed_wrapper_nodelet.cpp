@@ -964,6 +964,10 @@ void ZEDWrapperNodelet::readParameters()
         mTriggerAutoWB = true;
     }
     // <---- Dynamic
+
+    // ----> Simulation 
+    mNhNs.param<bool>("general/sim_mode", mSimMode, false);
+    // <---- Simulation 
 }
 
 void ZEDWrapperNodelet::checkResolFps()
@@ -2560,7 +2564,7 @@ void ZEDWrapperNodelet::callback_pubVideoDepth(const ros::TimerEvent& e)
 
     // ----> Data ROS timestamp
     ros::Time stamp = sl_tools::slTime2Ros(grab_ts);
-    if (mSvoMode) {
+    if (mSvoMode || mSimMode) {
         stamp = ros::Time::now();
     }
     // <---- Data ROS timestamp
@@ -2879,9 +2883,15 @@ void ZEDWrapperNodelet::publishSensData(ros::Time t)
         ts_baro = t;
         ts_mag = t;
     } else {
-        ts_imu = sl_tools::slTime2Ros(sens_data.imu.timestamp);
-        ts_baro = sl_tools::slTime2Ros(sens_data.barometer.timestamp);
-        ts_mag = sl_tools::slTime2Ros(sens_data.magnetometer.timestamp);
+        if (mSimMode) {
+            ts_imu = t;
+            ts_baro = t;
+            ts_mag = t;
+        } else {
+        ts_imu = sl_tools::slTime2Ros(sens_data.imu.timestamp); 
+        ts_baro = sl_tools::slTime2Ros(sens_data.barometer.timestamp); 
+        ts_mag = sl_tools::slTime2Ros(sens_data.magnetometer.timestamp); 
+        }
     }
 
     bool new_imu_data = ts_imu != lastTs_imu;
@@ -3179,7 +3189,7 @@ void ZEDWrapperNodelet::device_poll_thread_func()
     mObjDetPeriodMean_msec.reset(new sl_tools::CSmartMean(mCamFrameRate));
 
     // Timestamp initialization
-    if (mSvoMode) {
+    if (mSvoMode || mSimMode) {
         mFrameTimestamp = ros::Time::now();
     } else {
         mFrameTimestamp = sl_tools::slTime2Ros(mZed.getTimestamp(sl::TIME_REFERENCE::CURRENT));
@@ -3397,7 +3407,7 @@ void ZEDWrapperNodelet::device_poll_thread_func()
             // NODELET_INFO_STREAM("Grab time: " << elapsed_usec / 1000 << " msec");
 
             // Timestamp
-            if (mSvoMode) {
+            if (mSvoMode || mSimMode) {
                 mFrameTimestamp = ros::Time::now();
             } else {
                 mFrameTimestamp = sl_tools::slTime2Ros(mZed.getTimestamp(sl::TIME_REFERENCE::IMAGE));
@@ -3805,7 +3815,7 @@ void ZEDWrapperNodelet::device_poll_thread_func()
                 if (mPublishTf) {
                     ros::Time t;
 
-                    if (mSvoMode) {
+                    if (mSvoMode || mSimMode) {
                         t = ros::Time::now();
                     } else {
                         t = sl_tools::slTime2Ros(mZed.getTimestamp(sl::TIME_REFERENCE::CURRENT));
