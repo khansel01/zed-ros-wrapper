@@ -21,6 +21,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <arg name="camera_name"           default="zed" /> <!-- The name you want -->
     <arg name="camera_model"          default="zed" /> <!-- 'zed' or 'zedm' or 'zed2' -->
     <arg name="node_name"             default="zed_nodelet" />
+    
+    <!-- khansel01: SIM Mode needed for testing with gazebo-->
+    <arg name="sim_mode"              default="false" /><!-- Is sim mode, to use ROS:Time instead of Walltime> -->
 
     <!-- Load SVO file -->
     <arg name="svo_file"              default="" /><!-- <arg name="svo_file" default="path/to/svo/file.svo"> -->
@@ -73,6 +76,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
         <!-- Base frame -->
         <param name="general/base_frame"                value="$(arg base_frame)" />
+
+        <!-- khansel01: SIM Mode needed for testing with gazebo-->
+        <param name="general/sim_mode"                value="$(arg sim_mode)" />
 
         <!-- SVO file path -->
         <param name="svo_file"                          value="$(arg svo_file)" />
